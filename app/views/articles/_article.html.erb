@@ -1,22 +1,16 @@
-<div id="<%= dom_id article %>">
-  <p>
-    <strong>Title:</strong>
-    <%= article.title %>
-  </p>
-
-  <p>
-    <strong>Content:</strong>
-    <%= article.content %>
-  </p>
-
-  <p>
-    <strong>Published:</strong>
-    <%= article.published %>
-  </p>
-
-  <p>
-    <strong>Author:</strong>
-    <%= article.author.name %>
-  </p>
-
-</div>
+<tr id="<%= dom_id article %>">
+  <td><%= article.id %></td>
+  <td><%= article.author.name %></td>
+  <td><%= article.title %></td>
+  <td><%= article.content %></td>
+  <td><%= article.published ? 'Yes' : 'No' %></td>
+  <td><%= article.published_at %></td>
+  <td>
+    <% if article.respond_to?(:trending?) && article.trending? %>
+      <%= 'Trending' %>
+    <% elsif article.respond_to?(:hot?) && article.hot? %>
+      <%= 'Hot' %>
+    <% end %>
+  </td>
+  <td><%= article.comments.count %></td>
+</tr>
