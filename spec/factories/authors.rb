@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :author do
     sequence(:name) {|n| "author#{n}" }
-    sequence(:bio) {|n| "author#{n}-bio" }
-    user { nil }
+    sequence(:email) {|n| "author#{n}@gmail.com" }
+    password { "password" }
+    type { 'author' }
   end
 end
