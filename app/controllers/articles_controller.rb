@@ -23,6 +23,8 @@ class ArticlesController < ApplicationController
 
       @articles = @articles.commented([params[:comments_count].to_i, 1].max) if params[:commented] == '1'
     end
+
+    @articles = @articles.page(params[:page])
   end
 
   private
