@@ -1,0 +1,102 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Articles" %>
+
+<h1>Articles</h1>
+
+<hr>
+<h2>Filter results</h2>
+<%= form_with method: :get do |form| %>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 mb-2">
+        <div class="d-flex align-items-center">
+          <%= form.label :search, "Search:", class: 'mx-3' %>
+          <%= form.search_field :search, value: params[:search], class:'form-control', placeholder: 'Search by title or content...'%>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div class="d-flex align-items-center">
+          <%= form.label :days, "No. of days", class: 'mx-3' %>
+          <%= form.number_field :days, value: params[:days], class:'form-control w-75', placeholder: 'Filter articles published in past days'%>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+          <%= form.label :published, "Publish status", class: 'mx-3' %>
+          <%= form.select :published, [['All', 'all'], ['Published', 'true'], ['Unpublished', 'false']], { selected: params[:published] }, class:'form-control w-75'%>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+          <%= form.label :author_ids, 'Author', class: 'mx-3' %>
+          <%= form.collection_select :author_ids, @authors, :id, :name, { selected: params[:author_ids]&.reject(&:blank?) }, { multiple: true, class: 'form-control'} %>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div>
+          <%= form.label :tagged, 'Tagged articles', class: 'mx-3' %>
+          <%= form.check_box :tagged, { checked: params[:tagged] == '1' } %>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+          <%= form.label :tag_ids, 'Tags', class: 'mx-3' %>
+          <%= form.collection_select :tag_ids, @tags, :id, :name, { selected: params[:tag_ids]&.reject(&:blank?) }, { multiple: true, class: 'form-control'} %>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div>
+          <%= form.label :comments, 'Commented articles', class: 'mx-3' %>
+          <%= form.check_box :comments , { checked: params[:comments] == '1' } %>
+        </div>
+      </div>
+      <div class="col-6 mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+          <%= form.label :comments_count, 'Minimum comments count', class: 'mx-3' %>
+          <%= form.number_field :comments_count, value: params[:comments_count], class: 'form-control', placeholder: 'Enter comments count' %>
+        </div>
+      </div>
+      <hr>
+      <div class="col-12 mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+          <%= form.label :special, "Special filter", class: 'mx-3' %>
+          <%= form.select :special, [['Select', ''], ['Hot', 'hot'], ['Trending', 'trending']], { selected: params[:special] }, class:'form-control w-75'%>
+          <div class="w-600 mx-3">These filters may effect other filters</div>
+        </div>
+      </div>
+      <hr>
+      <div class="text-end">
+        <%= form.submit "Search", class: 'btn btn-primary' %>
+      </div>
+    </div>
+  </div>
+<% end %>
+<hr>
+
+<div id="articles">
+  <div>No. of records found: <%= @articles.length %></div>
+  <hr>
+  <table>
+    <thead>
+      <tr class='overflow-scroll'>
+        <th>ID</th>
+        <th>AUTHOR_NAME</th>
+        <th>TITLE</th>
+        <th>CONTENT</th>
+        <th>PUBLISHED</th>
+        <th>PUBLISHED AT</th>
+        <th>FEATURE ARTICLE</th>
+        <th>Comments #</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @articles.each do |article| %>
+        <%= render article %>
+      <% end %>
+    </tbody>
+  </table>
+  <div class="d-flex justify-content-center">
+    <%= paginate @articles %>
+  </div>
+</div>
