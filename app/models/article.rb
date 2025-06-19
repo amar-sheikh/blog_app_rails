@@ -10,7 +10,7 @@ class Article < ApplicationRecord
   scope :by_authors, ->(author_ids) { where(author_id: author_ids.compact) }
 
   scope :tagged, ->(tag_ids = []) do
-    tagged = joins(:tags)
+    tagged = joins(:tags).distinct
     tag_ids.present? ? tagged.where(tags: { id: tag_ids.compact }) : tagged
   end
 

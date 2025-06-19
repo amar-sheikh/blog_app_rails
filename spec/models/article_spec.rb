@@ -11,12 +11,11 @@ RSpec.describe Article, type: :model do
     describe 'published' do
       subject(:published_articles) { Article.published }
 
-      let(:published_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute ) }
+      let(:published_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute) }
       let(:un_published_article) { create(:article, published: false) }
 
       it 'returns published articles only' do
-        expect(published_articles).to include published_article
-        expect(published_articles).not_to include un_published_article
+        expect(published_articles).to eq [ published_article ]
       end
 
       context 'when no published article exists' do
@@ -31,12 +30,11 @@ RSpec.describe Article, type: :model do
     describe 'un_published' do
       subject(:un_published_articles) { Article.un_published }
 
-      let(:published_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute ) }
+      let(:published_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute) }
       let(:un_published_article) { create(:article, published: false) }
 
       it 'returns un published articles only' do
-        expect(un_published_articles).to include un_published_article
-        expect(un_published_articles).not_to include published_article
+        expect(un_published_articles).to eq [ un_published_article ]
       end
 
       context 'when no un published article exists' do
@@ -51,16 +49,12 @@ RSpec.describe Article, type: :model do
     describe 'recent' do
       subject(:recent_articles) { Article.recent }
 
-      before { Timecop.freeze('2025-02-1 10:30:00') }
-      after { Timecop.return }
-
       context 'when days not passed' do
-        let(:recent_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute ) }
+        let(:recent_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute) }
         let(:non_recent_article) { create(:article, published: true, published_at: 7.days.ago - 1.minutes ) }
 
         it 'returns recent articles only' do
-          expect(recent_articles).to include recent_article
-          expect(recent_articles).not_to include non_recent_article
+          expect(recent_articles).to eq [ recent_article ]
         end
 
         context 'when no recent article exists' do
@@ -76,12 +70,11 @@ RSpec.describe Article, type: :model do
         subject(:recent_articles) { Article.recent(days) }
 
         let(:days) { 4 }
-        let(:recent_article) { create(:article, published: true, published_at: 4.days.ago + 1.minute ) }
+        let(:recent_article) { create(:article, published: true, published_at: 4.days.ago + 1.minute) }
         let(:non_recent_article) { create(:article, published: true, published_at: 4.days.ago - 1.minutes ) }
 
         it 'returns recent articles only' do
-          expect(recent_articles).to include recent_article
-          expect(recent_articles).not_to include non_recent_article
+          expect(recent_articles).to eq [ recent_article ]
         end
 
         context 'when no recent article exists with in days' do
@@ -116,9 +109,7 @@ RSpec.describe Article, type: :model do
       let(:non_matching_article) { create(:article, title: 'article 2', content: 'content') }
 
       it 'returns matching articles' do
-        expect(search_articles).to include matching_article_1
-        expect(search_articles).to include matching_article_2
-        expect(search_articles).not_to include non_matching_article
+        expect(search_articles).to eq [ matching_article_1, matching_article_2 ]
       end
 
       context 'when no matching result found' do
@@ -139,9 +130,7 @@ RSpec.describe Article, type: :model do
         let(:search) { '' }
 
         it 'returns all articles' do
-          expect(search_articles).to include matching_article_1
-          expect(search_articles).to include matching_article_2
-          expect(search_articles).to include non_matching_article
+          expect(search_articles).to eq [ matching_article_1, matching_article_2, non_matching_article ]
         end
       end
     end
@@ -156,8 +145,7 @@ RSpec.describe Article, type: :model do
       let(:author_ids) { [ author1.id ] }
 
       it 'returns article of matching authors only' do
-        expect(by_authors).to include author1_article
-        expect(by_authors).not_to include author2_article
+        expect(by_authors).to eq [ author1_article ]
       end
 
       context 'when no article found for authors' do
@@ -198,17 +186,14 @@ RSpec.describe Article, type: :model do
 
       let!(:tag1) { create(:tag) }
       let!(:tag2) { create(:tag) }
-      let!(:non_tagged_article) { create(:article ) }
+      let!(:non_tagged_article) { create(:article) }
       let!(:tag1_article) { create(:article, tag_ids:[tag1.id] ) }
       let!(:tag2_article) { create(:article, tag_ids:[tag2.id] ) }
       let!(:both_tag_article) { create(:article, tag_ids:[tag1.id, tag2.id] ) }
 
       context 'when tag ids not passed' do
         it 'returns tagged articles' do
-          expect(tagged_articles).to include tag1_article
-          expect(tagged_articles).to include tag2_article
-          expect(tagged_articles).to include both_tag_article
-          expect(tagged_articles).not_to include non_tagged_article
+          expect(tagged_articles).to eq [ tag1_article, tag2_article, both_tag_article ]
         end
       end
 
@@ -218,10 +203,7 @@ RSpec.describe Article, type: :model do
         let(:tag_ids) { [ tag1.id ] }
 
         it 'returns matching tag articles' do
-          expect(tagged_articles).to include tag1_article
-          expect(tagged_articles).to include both_tag_article
-          expect(tagged_articles).not_to include tag2_article
-          expect(tagged_articles).not_to include non_tagged_article
+          expect(tagged_articles).to eq [ tag1_article, both_tag_article ]
         end
 
         context 'when no article found for matching tags' do
@@ -237,10 +219,7 @@ RSpec.describe Article, type: :model do
           let(:tag_ids) { [] }
 
           it 'returns tagged articles' do
-            expect(tagged_articles).to include tag1_article
-            expect(tagged_articles).to include tag2_article
-            expect(tagged_articles).to include both_tag_article
-            expect(tagged_articles).not_to include non_tagged_article
+            expect(tagged_articles).to eq [ tag1_article, tag2_article, both_tag_article ]
           end
         end
 
@@ -256,10 +235,7 @@ RSpec.describe Article, type: :model do
           let(:tag_ids) { [ tag1.id.to_s ] }
 
           it 'returns matching tag articles' do
-            expect(tagged_articles).to include tag1_article
-            expect(tagged_articles).to include both_tag_article
-            expect(tagged_articles).not_to include tag2_article
-            expect(tagged_articles).not_to include non_tagged_article
+            expect(tagged_articles).to eq [ tag1_article, both_tag_article ]
           end
         end
       end
@@ -268,15 +244,13 @@ RSpec.describe Article, type: :model do
     describe 'commented' do
       subject(:commented_articles) { Article.commented }
 
-      let!(:non_commented_article) { create(:article ) }
-      let!(:article_with_1_comment) { create(:article, :commented, comments_count: 1 ) }
-      let!(:article_with_2_comments) { create(:article, :commented, comments_count: 2 ) }
+      let!(:non_commented_article) { create(:article) }
+      let!(:article_with_1_comment) { create(:article, :commented, comments_count: 1) }
+      let!(:article_with_2_comments) { create(:article, :commented, comments_count: 2) }
 
       context 'when comment count not passed' do
         it 'returns commented articles' do
-          expect(commented_articles).to include article_with_1_comment
-          expect(commented_articles).to include article_with_2_comments
-          expect(commented_articles).not_to include non_commented_article
+          expect(commented_articles).to eq [ article_with_1_comment, article_with_2_comments ]
         end
       end
 
@@ -286,9 +260,7 @@ RSpec.describe Article, type: :model do
         let(:comments_count) { 2 }
 
         it 'returns articles with at least the specified number of comments' do
-          expect(commented_articles).to include article_with_2_comments
-          expect(commented_articles).not_to include article_with_1_comment
-          expect(commented_articles).not_to include non_commented_article
+          expect(commented_articles).to eq [ article_with_2_comments ]
         end
 
         context 'when comment count in string' do
@@ -322,17 +294,14 @@ RSpec.describe Article, type: :model do
 
       let!(:tag1) { create(:tag) }
       let!(:tag2) { create(:tag) }
-      let!(:non_hot_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute ) }
-      let!(:hot_article_with_tag1) { create(:article, :commented, comments_count: 1, tag_ids: [tag1.id], published: true, published_at: 7.days.ago + 1.minute ) }
-      let!(:hot_article_with_tag2) { create(:article, :commented, comments_count: 1, tag_ids: [tag2.id], published: true, published_at: 4.days.ago + 1.minute ) }
-      let!(:hot_article_with_both_tags) { create(:article, :commented, comments_count: 1, tag_ids: [tag1.id, tag2.id], published: true, published_at: 4.days.ago + 1.minute ) }
+      let!(:non_hot_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute) }
+      let!(:hot_article_with_tag1) { create(:article, :commented, comments_count: 1, tag_ids: [tag1.id], published: true, published_at: 7.days.ago + 1.minute) }
+      let!(:hot_article_with_tag2) { create(:article, :commented, comments_count: 1, tag_ids: [tag2.id], published: true, published_at: 4.days.ago + 1.minute) }
+      let!(:hot_article_with_both_tags) { create(:article, :commented, comments_count: 1, tag_ids: [tag1.id, tag2.id], published: true, published_at: 4.days.ago + 1.minute) }
 
       context 'when no argument passed' do
         it 'returns hot articles' do
-          expect(hot_articles).to include hot_article_with_tag1
-          expect(hot_articles).to include hot_article_with_tag2
-          expect(hot_articles).to include hot_article_with_both_tags
-          expect(hot_articles).not_to include non_hot_article
+          expect(hot_articles).to eq [ hot_article_with_tag1, hot_article_with_tag2, hot_article_with_both_tags ]
         end
 
         context 'when no hot article exists' do
@@ -352,10 +321,7 @@ RSpec.describe Article, type: :model do
         let(:days) { 4 }
 
         it 'returns hot articles within days' do
-          expect(hot_articles).to include hot_article_with_tag2
-          expect(hot_articles).to include hot_article_with_both_tags
-          expect(hot_articles).not_to include hot_article_with_tag1
-          expect(hot_articles).not_to include non_hot_article
+          expect(hot_articles).to eq [ hot_article_with_tag2, hot_article_with_both_tags ]
         end
 
         context 'when no hot article exists with in days' do
@@ -386,10 +352,7 @@ RSpec.describe Article, type: :model do
         let(:days) { 4 }
 
         it 'returns matching hot articles with in days' do
-          expect(hot_articles).to include hot_article_with_both_tags
-          expect(hot_articles).not_to include hot_article_with_tag1
-          expect(hot_articles).not_to include hot_article_with_tag2
-          expect(hot_articles).not_to include non_hot_article
+          expect(hot_articles).to eq [ hot_article_with_both_tags ]
         end
 
         context 'when no article found for matching tags' do
@@ -405,10 +368,7 @@ RSpec.describe Article, type: :model do
           let(:tag_ids) { [] }
 
           it 'returns all hot articles within days' do
-            expect(hot_articles).to include hot_article_with_tag2
-            expect(hot_articles).to include hot_article_with_both_tags
-            expect(hot_articles).not_to include hot_article_with_tag1
-            expect(hot_articles).not_to include non_hot_article
+            expect(hot_articles).to eq [ hot_article_with_tag2, hot_article_with_both_tags ]
           end
         end
 
@@ -424,10 +384,7 @@ RSpec.describe Article, type: :model do
           let(:tag_ids) { [ tag1.id.to_s ] }
 
           it 'returns all matching hot articles within days' do
-            expect(hot_articles).to include hot_article_with_both_tags
-            expect(hot_articles).not_to include hot_article_with_tag2
-            expect(hot_articles).not_to include hot_article_with_tag1
-            expect(hot_articles).not_to include non_hot_article
+            expect(hot_articles).to eq [ hot_article_with_both_tags ]
           end
         end
       end
@@ -438,17 +395,14 @@ RSpec.describe Article, type: :model do
 
       let!(:tag1) { create(:tag) }
       let!(:tag2) { create(:tag) }
-      let!(:non_trending_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute ) }
-      let!(:trending_article_with_tag1) { create(:article, :commented, comments_count: 5, tag_ids: [tag1.id], published: true, published_at: 3.days.ago + 1.minute ) }
-      let!(:trending_article_with_tag2) { create(:article, :commented, comments_count: 6, tag_ids: [tag2.id], published: true, published_at: 2.days.ago + 2.minute ) }
-      let!(:trending_article_with_both_tags) { create(:article, :commented, comments_count: 7, tag_ids: [tag1.id, tag2.id], published: true, published_at: 2.days.ago + 1.minute ) }
+      let!(:non_trending_article) { create(:article, published: true, published_at: 7.days.ago + 1.minute) }
+      let!(:trending_article_with_tag1) { create(:article, :commented, comments_count: 5, tag_ids: [tag1.id], published: true, published_at: 3.days.ago + 1.minute) }
+      let!(:trending_article_with_tag2) { create(:article, :commented, comments_count: 6, tag_ids: [tag2.id], published: true, published_at: 2.days.ago + 2.minute) }
+      let!(:trending_article_with_both_tags) { create(:article, :commented, comments_count: 7, tag_ids: [tag1.id, tag2.id], published: true, published_at: 2.days.ago + 1.minute) }
 
       context 'when no argument passed' do
         it 'returns trending articles' do
-          expect(trending_articles).to include trending_article_with_tag1
-          expect(trending_articles).to include trending_article_with_tag2
-          expect(trending_articles).to include trending_article_with_both_tags
-          expect(trending_articles).not_to include non_trending_article
+          expect(trending_articles).to eq [ trending_article_with_both_tags, trending_article_with_tag2, trending_article_with_tag1 ]
         end
 
         context 'when no trending article exists' do
@@ -468,10 +422,7 @@ RSpec.describe Article, type: :model do
         let(:comments_count) { 6 }
 
         it 'returns trending articles with at least the specified number of comments' do
-          expect(trending_articles).to include trending_article_with_tag2
-          expect(trending_articles).to include trending_article_with_both_tags
-          expect(trending_articles).not_to include trending_article_with_tag1
-          expect(trending_articles).not_to include non_trending_article
+          expect(trending_articles).to eq [ trending_article_with_both_tags, trending_article_with_tag2 ]
         end
 
         context 'when no trending article having comment count equal or more than specified value' do
@@ -514,10 +465,7 @@ RSpec.describe Article, type: :model do
         let(:days) { 2 }
 
         it 'returns trending articles within days' do
-          expect(trending_articles).to include trending_article_with_tag2
-          expect(trending_articles).to include trending_article_with_both_tags
-          expect(trending_articles).not_to include trending_article_with_tag1
-          expect(trending_articles).not_to include non_trending_article
+          expect(trending_articles).to eq [ trending_article_with_both_tags, trending_article_with_tag2 ]
         end
 
         context 'when no trending article exists with in days' do
@@ -549,10 +497,7 @@ RSpec.describe Article, type: :model do
         let(:comments_count) { 6 }
 
         it 'returns matching trending articles with in days' do
-          expect(trending_articles).to include trending_article_with_both_tags
-          expect(trending_articles).not_to include trending_article_with_tag1
-          expect(trending_articles).not_to include trending_article_with_tag2
-          expect(trending_articles).not_to include non_trending_article
+          expect(trending_articles).to eq [ trending_article_with_both_tags ]
         end
 
         context 'when no article found for matching tags' do
@@ -568,10 +513,7 @@ RSpec.describe Article, type: :model do
           let(:tag_ids) { [] }
 
           it 'returns trending articles within days' do
-            expect(trending_articles).to include trending_article_with_tag2
-            expect(trending_articles).to include trending_article_with_both_tags
-            expect(trending_articles).not_to include trending_article_with_tag1
-            expect(trending_articles).not_to include non_trending_article
+            expect(trending_articles).to eq [ trending_article_with_both_tags, trending_article_with_tag2 ]
           end
         end
 
@@ -587,12 +529,38 @@ RSpec.describe Article, type: :model do
           let(:tag_ids) { [ tag1.id.to_s ] }
 
           it 'returns matching trending articles within days' do
-            expect(trending_articles).to include trending_article_with_both_tags
-            expect(trending_articles).not_to include trending_article_with_tag2
-            expect(trending_articles).not_to include trending_article_with_tag1
-            expect(trending_articles).not_to include non_trending_article
+            expect(trending_articles).to eq [ trending_article_with_both_tags ]
           end
         end
+      end
+    end
+  end
+
+  describe 'pagination' do
+    subject(:articles) { Article.page(page_number) }
+
+    let!(:article_1) { create(:article) }
+    let!(:article_2) { create(:article) }
+    let!(:article_3) { create(:article) }
+    let!(:article_4) { create(:article) }
+    let!(:article_5) { create(:article) }
+    let(:page_number) { 1 }
+
+    before do
+      allow(Article).to receive(:default_per_page).and_return(3)
+    end
+
+    context 'when page 1' do
+      it 'returns first 3 articles' do
+        expect(articles).to eq [ article_1, article_2, article_3 ]
+      end
+    end
+
+    context 'when page 2' do
+      let(:page_number) { 2 }
+
+      it 'returns articles after first 3 articles' do
+        expect(articles).to eq [ article_4, article_5 ]
       end
     end
   end
